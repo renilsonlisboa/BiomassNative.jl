@@ -4,6 +4,6 @@
 /Manifest.toml
 /docs/Manifest.toml
 /docs/build/
-*.vscode
-.github
+*.github/
 .gitignore
+.vscode
