@@ -1,5 +1,6 @@
 module BiomassNative
 
+# Importa os pacotes utilizados para desenvolvimento e funcionamento do programa
 import QML: QString, @qmlfunction, loadqml, exec
 using LinearAlgebra
 using Statistics
@@ -7,16 +8,6 @@ import Plots: scatter, plot!, savefig
 
 # Exporta a função Inventory possibilitando ser chamada via terminal pelo usuário
 export CalcBiomass
-
-    # Função para seleção de arquivo em .CSV com dados para processamento
-    function singleFile(arg)
-        ImportData.singlefile(arg)
-    end
-
-    # Função salvar os resultados do processamento em .XLSX
-    function saveFile(Resultado, uri)
-        Save.saveFile(Resultado, uri)
-    end
 
     # Define a função de ajuste de equação
     function ajustarEq(Dados, save, nivel)
