@@ -69,6 +69,7 @@ export CalcBiomass
             RES=log.(B)-yhat
             b=D*Z'*inv(Z*D*Z'+R)*RES
             Bhat=Bfixo+b
+            Bhat[1] = Bhat[1] + (R[1,1])
             x0= 5:0.001:45
             xGrid = [ones(size(x0,1)) x0]
             xGridt = [ones(size(x0,1)) log.(x0)]
@@ -80,7 +81,7 @@ export CalcBiomass
 
         # Gerá os gráficos com os paramêtros selecionados
         plt = scatter(DAP, B, xlabel = "Diâmetro à altura do peito (cm)", ylabel = "Biomassa (Kg)", grid_linewidth = 0, color = "green", label = false)
-        plt = plot!(xGrid[:, 2], yestimado, label = fal3se) 
+        plt = plot!(xGrid[:, 2], yestimado, label = false) 
 
         # Apresenta o gráfico de resutados
         display(plt)
