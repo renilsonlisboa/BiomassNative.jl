@@ -112,6 +112,12 @@ ApplicationWindow {
             title: "Ajuste de Equação a Nível de Tipologia Florestal"
             width: 640
             height: 480
+            x: (Screen.width - width) / 2 // Centralizar horizontalmente
+            y: (Screen.height - height) / 2 // Centralizar verticalmente
+            minimumWidth: 640
+            maximumWidth: 640
+            minimumHeight: 480
+            maximumHeight: 480
             visible: false
 
             Rectangle {
@@ -175,7 +181,7 @@ ApplicationWindow {
                 }
 
                 Grid {
-                    id: inputData
+                    id: inputDataTipologia
                     columns: 2
                     anchors.centerIn: parent
                     anchors.verticalCenterOffset: -20
@@ -190,6 +196,9 @@ ApplicationWindow {
                             width: 180
                             height: 30
                             font.pointSize: 14
+                            validator: RegularExpressionValidator{
+                                regularExpression: /^\d*\.?\d+(,\d+)?$/
+                            }
 
                             Connections {
                                 onTextChanged: {
@@ -214,25 +223,28 @@ ApplicationWindow {
                     Connections {
                         target: processtipoFlorestal
                         onClicked: {
+                            busyIndicatorTipologia.running = true
+
                             var columnVectors = []
 
                             // Inicializa vetores para cada coluna
-                            for (var i = 0; i < inputData.columns; i++) {
+                            for (var i = 0; i < inputDataTipologia.columns; i++) {
                                 columnVectors.push([])
                             }
 
                             // Itera pelos filhos do GridLayout
-                            for (var j = 0; j < inputData.children.length; j++) {
+                            for (var j = 0; j < inputDataTipologia.children.length; j++) {
                                 // Adiciona os valores dos TextField aos vetores correspondentes
-                                if (inputData.children[j] instanceof TextField) {
-                                    var columnIndex = j % inputData.columns
-                                    var textValue = inputData.children[j].text.trim(
+                                if (inputDataTipologia.children[j] instanceof TextField) {
+                                    var columnIndex = j % inputDataTipologia.columns
+                                    var textValue = inputDataTipologia.children[j].text.trim(
                                                 )
                                     // Remove espaços em branco
 
                                     // Verifica se o valor é vazio ou nulo
                                     if (textValue === "") {
                                         emptyDialogTipoFlorestal.open()
+                                        busyIndicatorTipologia.running = false
                                         return
                                         // Aborta o processamento se dados estiverem faltando
                                     }
@@ -247,6 +259,15 @@ ApplicationWindow {
                 }
             }
 
+            BusyIndicator {
+                id: busyIndicatorTipologia
+                width: 90
+                height: 90
+                running: false
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: 190
+            }
+
             // Dialogo para seleção do local de salvamento dos arquivos de resultado
             FileDialog {
                 id: saveDialogTipoFlorestal
@@ -256,15 +277,17 @@ ApplicationWindow {
                 Connections {
                     target: saveDialogTipoFlorestal
                     onAccepted: {
-
                         var resultado = Julia.ajustarEq(columnVectorsVals, saveDialogTipoFlorestal.selectedFile, comboBox.currentIndex)
-
-                        console.log(comboBox.currentIndex)
 
                         bfixo = resultado[0]
                         best = resultado[1]
 
                         conclusionDialogTipoFlorestal.open()
+
+                        busyIndicatorTipologia.running = false
+                    }
+                    onRejected: {
+                        busyIndicatorTipologia.running = false
                     }
                 }
 
@@ -287,13 +310,33 @@ ApplicationWindow {
                 text: "Os dados informados são insuficientes para a calibração.\nPreencha todos os campos e tente novamente."
                 buttons: MessageDialog.Ok
             }
+
+            Connections {
+                target: tipologiaFlorestal
+                onClosing: {
+                    for (var i = 0; i < inputDataTipologia.columns; i++) {
+                        for (var j = 0; j < inputDataTipologia.children.length; j++) {
+                            if (inputDataTipologia.children[j] instanceof TextField) {
+                                inputDataTipologia.children[j].text = ""
+                            }
+                        }
+                    }
+                    comboBox2.currentIndex = 0
+                }
+            }
         }
 
         Window {
             id: floresta
+            title: "Ajuste de Equação a Nível de Floresta"
             width: 640
             height: 480
-            title: "Ajuste de Equação a Nível de Floresta"
+            x: (Screen.width - width) / 2 // Centralizar horizontalmente
+            y: (Screen.height - height) / 2 // Centralizar verticalmente
+            minimumWidth: 640
+            maximumWidth: 640
+            minimumHeight: 480
+            maximumHeight: 480
             visible: false
 
             Rectangle {
@@ -372,6 +415,9 @@ ApplicationWindow {
                             width: 180
                             height: 30
                             font.pointSize: 14
+                            validator: RegularExpressionValidator{
+                                regularExpression: /^\d*\.?\d+(,\d+)?$/
+                            }
 
                             Connections {
                                 onTextChanged: {
@@ -396,6 +442,7 @@ ApplicationWindow {
                     Connections {
                         target: processFloresta
                         onClicked: {
+                            busyIndicatorFloresta.running = true
                             var columnVectors = []
 
                             // Inicializa vetores para cada coluna
@@ -415,6 +462,7 @@ ApplicationWindow {
                                     // Verifica se o valor é vazio ou nulo
                                     if (textValue === "") {
                                         emptyDialogFloresta.open()
+                                        busyIndicatorFloresta.running = false
                                         return
                                         // Aborta o processamento se dados estiverem faltando
                                     }
@@ -427,6 +475,15 @@ ApplicationWindow {
                         }
                     }
                 }
+            }
+
+           BusyIndicator {
+                id: busyIndicatorFloresta
+                width: 90
+                height: 90
+                running: false
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: 190
             }
 
             // Dialogo para seleção do local de salvamento dos arquivos de resultado
@@ -445,6 +502,11 @@ ApplicationWindow {
                         best = resultado[1]
 
                         conclusionDialogFloresta.open()
+
+                        busyIndicatorFloresta.running = false
+                    }
+                    onRejected: {
+                        busyIndicatorFloresta.running = false
                     }
                 }
 
@@ -466,6 +528,20 @@ ApplicationWindow {
                 title: "Dados insuficientes para Calibração"
                 text: "Os dados informados são insuficientes para a calibração.\nPreencha todos os campos e tente novamente."
                 buttons: MessageDialog.Ok
+            }
+
+            Connections {
+                target: floresta
+                onClosing: {
+                    for (var i = 0; i < inputDataFloresta.columns; i++) {
+                        for (var j = 0; j < inputDataFloresta.children.length; j++) {
+                            if (inputDataFloresta.children[j] instanceof TextField) {
+                                inputDataFloresta.children[j].text = ""
+                            }
+                        }
+                    }
+                    comboBoxFloresta.currentIndex = 0
+                }
             }
         }
     }
