@@ -21,7 +21,7 @@ export CalcBiomass
         # Confere se o URL para salvar o resultado é diferente de nulo
         if save !== nothing
             save_s = QString(save)
-        else
+        else 
             return 0
         end
 
@@ -40,7 +40,6 @@ export CalcBiomass
             Bfixo=[-2.1346; 2.3477]
             D=[0.1737 -0.0799; -0.0799 0.0406]
             R = [0.1612]
-            #Bfixo[1] = Bfixo[1] + R[1]/2
             n=size(DAP,1)
             R=diagm(repeat(R, inner = n))
             Z= log.(DAP)
@@ -48,8 +47,9 @@ export CalcBiomass
             yhat = Z*Bfixo
             RES=log.(B).-yhat
             b=D*Z'*inv(Z*D*Z'+R)*RES
+            b[1] = b[1] + (R[1,1]/2)
+            Bfixo[1] = Bfixo[1] + (R[1,1]/2)
             Bhat=Bfixo+b
-            Bhat[1] = Bhat[1] + (R[1,1])
             x0= 5:0.001:45
             xGrid = [ones(size(x0,1)) x0]
             xGridt = [ones(size(x0,1)) log.(x0)]
@@ -68,8 +68,9 @@ export CalcBiomass
             yhat = Z*Bfixo
             RES=log.(B)-yhat
             b=D*Z'*inv(Z*D*Z'+R)*RES
+            b[1] = b[1] + (R[1,1]/2)
+            Bfixo[1] = Bfixo[1] + (R[1,1]/2)
             Bhat=Bfixo+b
-            Bhat[1] = Bhat[1] + (R[1,1])
             x0= 5:0.001:45
             xGrid = [ones(size(x0,1)) x0]
             xGridt = [ones(size(x0,1)) log.(x0)]
@@ -102,7 +103,7 @@ export CalcBiomass
         current_directory = dirname(@__FILE__)
 
         # Carrega o arquivo .qml localizado no diretório atual
-        loadqml(joinpath(current_directory, "src/qml", "main.qml"))
+        loadqml(joinpath(current_directory, "qml", "main.qml"))
 
         # Executa o arquivo .QML localizado e carregado anteriormente
         exec()

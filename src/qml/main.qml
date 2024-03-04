@@ -1,3 +1,5 @@
+//add borda combobox + botão
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts 
@@ -33,7 +35,8 @@ ApplicationWindow {
             source: "images/wallpaper.jpg"
             width: retangulo.width
             height: retangulo.height // Substitua pelo caminho real da sua imagem
-            fillMode: Image.Stretch
+            fillMode: Image.PreserveAspectFit
+            opacity: 0.65
         }
 
         ComboBox {
@@ -132,6 +135,7 @@ ApplicationWindow {
                     width: rectanglebase.width
                     height: rectanglebase.height // Substitua pelo caminho real da sua imagem
                     fillMode: Image.Stretch
+                    opacity: 0.60
                 }
 
                 ComboBox {
